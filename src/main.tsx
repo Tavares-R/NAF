@@ -8,26 +8,23 @@ import '@govbr-ds/core/dist/core.min.css';
 import {App} from './App.tsx'
 
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    // Sua definição de rotas está perfeita, não mude nada aqui
+    {
+      path: '/',
+      element: <App />,
+      children: [
+        { path: '/', element: <FormularioPage /> },
+        { path: '/dashboard', element: <DashBoardPage /> },
+      ],
+    },
+    { path: '/login', element: <LoginPage /> },
+  ],
   {
-    path: '/',
-    element: <App />, 
-    children: [
-      {
-        path: '/', 
-        element: <FormularioPage />,
-      },
-      {
-        path: '/dashboard',
-        element: <DashBoardPage />,
-      },
-    ],
-  },
-  {
-    path: '/login', 
-    element: <LoginPage />,
-  },
-]);
+    basename: "/NAF/", 
+  }
+);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
