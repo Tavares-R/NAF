@@ -10,7 +10,6 @@ import {App} from './App.tsx'
 
 const router = createBrowserRouter(
   [
-    // Sua definição de rotas está perfeita, não mude nada aqui
     {
       path: '/',
       element: <App />,
