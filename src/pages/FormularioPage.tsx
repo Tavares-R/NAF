@@ -1,8 +1,9 @@
-import { BrCard, BrItem, BrList, BrInput, BrButton, BrRadio, BrSelect } from '@govbr-ds/webcomponents-react';
+import { BrCard, BrItem, BrList, BrInput, BrButton, BrRadio, BrSelect, BrTextarea } from '@govbr-ds/webcomponents-react';
 import { useState } from 'react';
 import DatePicker, { registerLocale } from "react-datepicker";
 import { ptBR } from 'date-fns/locale';
 import "react-datepicker/dist/react-datepicker.css";
+import { atendimentosPF, atendimentosMEI } from '../data/atendimentos';
 registerLocale('pt-BR', ptBR);
 
 
@@ -10,10 +11,12 @@ interface IFormularioData {
     dataAtendimento: Date | null;
     modalidade: string;
     tipoUsuario: string;
+    tipoUsuarioOutro: string;
     atendimentoConclusivo: string;
     tipoAtendimento: string;
     tipoAtendimentoOutro: string;
 }
+
 
 export function FormularioPage() {
 
@@ -29,6 +32,7 @@ export function FormularioPage() {
         dataAtendimento: null,
         modalidade: '',
         tipoUsuario: '',
+        tipoUsuarioOutro: '',
         atendimentoConclusivo: '',
         tipoAtendimento: '',
         tipoAtendimentoOutro: '',
@@ -50,7 +54,19 @@ export function FormularioPage() {
     const handleComponentChange = (event: any, fieldname: keyof IFormularioData) => {
         const value = event.detail !== undefined? event.detail : event.target.value;
 
-        setFormData(prevState => ({...prevState, [fieldname]: value}))
+        setFormData(prevState => {
+            const newState = {
+                ...prevState,
+                [fieldname]: value,
+            };
+
+            if(fieldname === 'tipoUsuario') {
+                newState.tipoAtendimento = '';
+                newState.tipoAtendimentoOutro = '';
+            }
+
+            return newState;
+        })
     }
 
     const handleSubmit = () => {
@@ -61,6 +77,19 @@ export function FormularioPage() {
 
         alert(JSON.stringify(dadosCompletos, null, 2));
     }
+
+    const camposObrigatorios: (keyof IFormularioData)[] = [
+    'dataAtendimento',
+    'modalidade',
+    'tipoUsuario',
+    'atendimentoConclusivo',
+    'tipoAtendimento',
+    ]
+
+    const isFormularioValido = camposObrigatorios.every(campo => {
+        const valor = formData[campo];
+        return valor !== null && valor !== undefined && valor !== '';
+    });
 
   return (
     <div className="formulario-container">
@@ -84,7 +113,7 @@ export function FormularioPage() {
 
         <div className="br-divider"></div>
 
-        <div className="form-fields mt-4">
+        <div className="form-fields mt-4 ml-4">
             <h2 className='text-medium text-bold mb-4'>Detalhes do Atendimento</h2>
 
             {/* Campo de data  */}
@@ -112,64 +141,81 @@ export function FormularioPage() {
             </div>
 
 
-            
-            <div className="br-grid">
-
-                {/* Campo Tipo de usuário  */}
-                <div className="br-col-sm-6 br-col-lg-4 mb-4">
-                    <BrSelect
-                        label="3. Tipo de usuário *" placeholder="Selecione uma opção"
-                        options={JSON.stringify([
-                            { label: 'Pessoa Física', value: 'pf' },
-                            { label: 'Pessoa Jurídica', value: 'pj' },
-                        ])}
-                        onValueChange={(e) => handleComponentChange(e, 'tipoUsuario')}
-                    />
-                </div>
-                {/* Campo atendimento conclusivo  */}
-                <div className="br-col-sm-6 br-col-lg-4 mb-4">
-                    <BrSelect
-                        label="4. O atendimento prestado foi conclusivo? *" placeholder="Selecione uma opção"
-                        options={JSON.stringify([
-                            { label: 'Sim', value: 'sim' },
-                            { label: 'Não', value: 'nao' },
-                        ])}
-                        onValueChange={(e) => handleComponentChange(e, 'atendimentoConclusivo')}
-                    />
-                </div>
-
-            </div>
-            {/* Campo tipo de atendimento  */}
+            {/* Campo Tipo de usuário  */}
             <div className="mb-4">
-                <p className="label mb-2">5. Tipo de atendimento *</p>
-                <div className='mb-2'><BrRadio name="tipoAtendimento" label="Auxílio à elaboração e orientações sobre a Declaração de Ajuste Anual do IRPF" value="irpf" onCheckedChange={(e) => handleRadioChange(e, 'tipoAtendimento')} /></div>
-                <div className='mb-2'><BrRadio name="tipoAtendimento" label="Auxílio à inscrição e Informações cadastrais de CPF" value="cpf" onCheckedChange={(e) => handleRadioChange(e, 'tipoAtendimento')} /></div>
-                <div className='mb-2'><BrRadio name="tipoAtendimento" label="Auxílio à inscrição e Informações cadastrais do CNPJ" value="cnpj" onCheckedChange={(e) => handleRadioChange(e, 'tipoAtendimento')} /></div>
-                <div className='mb-2'><BrRadio name="tipoAtendimento" label="Outra" value="outra" onCheckedChange={(e) => handleRadioChange(e, 'tipoAtendimento')} /></div>
-                
-                
-                
-                
-                {formData.tipoAtendimento === 'outra' && (
+                <BrSelect
+                    label="3. Tipo de usuário *" placeholder="Selecione uma opção" 
+                    options={JSON.stringify([
+                        { label: 'Pessoa Física', value: 'pf' },
+                        { label: 'Microempreendedor Individual', value: 'mei' },
+                        { label: 'Pequenos Proprietários Rurais', value: 'rural' },
+                        { label: 'Mulheres em situação de risco e vulnerabilidade conforme Programa Mulher Cidadã, Portaria MF 26/2023', value: 'mulher' },
+                        { label: 'Entidade sem fins lucrativos', value: 'entidades' },
+                        { label: 'Outra', value: 'outra' }
+                    ])}
+                    onValueChange={(e) => handleComponentChange(e, 'tipoUsuario')}
+                />
+                {formData.tipoUsuario === 'outra' && (
                     <div className="mt-2" style={{ maxWidth: '400px' }}>
                         <BrInput
+                            label="Especifique qual"
+                            placeholder="Digite o tipo de atendimento"
+                            onValueChange={(e) => handleComponentChange(e, 'tipoUsuarioOutro')}
+                        />
+                    </div>
+                )}
+
+            </div>
+
+            
+             {/* Campo tipo de atendimento  */}
+            {formData.tipoUsuario && (
+                <div className="mb-4">
+                    <p className="label mb-2">4. Tipo de atendimento *</p>
+                    {formData.tipoUsuario =='pf' && atendimentosPF.map((atendimento) => (
+                        <div className="mb-2" key={atendimento.id}>
+                            <BrRadio name="tipoAtendimento" value = {atendimento.id} label = {atendimento.label} onCheckedChange={(e) => handleRadioChange(e, "tipoAtendimento")}/>
+                        </div>
+                    ))}
+
+                    {formData.tipoUsuario =='mei' && atendimentosMEI.map((atendimento) => (
+                        <div className="mb-2" key={atendimento.id}>
+                            <BrRadio name="tipoAtendimento" value = {atendimento.id} label = {atendimento.label} onCheckedChange={(e) => handleRadioChange(e, "tipoAtendimento")}/>
+                        </div>
+                    ))}
+
+                    {formData.tipoAtendimento.includes('outra') && (
+                    <div className="mt-2" style={{ maxWidth: '400px' }}>
+                        <BrTextarea
                             label="Especifique qual"
                             placeholder="Digite o tipo de atendimento"
                             onValueChange={(e) => handleComponentChange(e, 'tipoAtendimentoOutro')}
                         />
                     </div>
                 )}
+                </div>
+            )}
+           
+             {/* Campo atendimento conclusivo  */}
+             {formData.tipoAtendimento && (
+                <div className="mb-4">
+                    <p className="label mb-2">5. O atendimento prestado foi conclusivo? *</p>
+                    <BrRadio name="atendimentoConclusivo" label="Sim" value="sim" onCheckedChange={(e) => handleRadioChange(e, 'atendimentoConclusivo')} />
+                    <BrRadio className="ml-4" name="atendimentoConclusivo" label="Não" value="nao" onCheckedChange={(e) => handleRadioChange(e, 'atendimentoConclusivo')} />
+                </div>
+             )}
 
+             {/* Botão de submit  */}
+            <div className="form-actions mt-4">
+                <BrButton emphasis='primary' onClick={handleSubmit} disabled={!isFormularioValido}>
+                Enviar Formulário
+                </BrButton>
             </div>
+            
         </div>
 
 
-        {/* Botão de submit  */}
-        <div className="form-actions mt-4">
-            <BrButton emphasis='primary' onClick={handleSubmit}>
-            Enviar Formulário
-            </BrButton>
-        </div>
+        
     </div>
   )
 }
