@@ -10,7 +10,7 @@ export function Header() {
           <div className="header-top">
             <div className="header-logo">
               <a href="https://www.gov.br" target="_blank" rel="noopener noreferrer">
-                <img src="https://cdn.ds.gov.br/assets/img/logo.svg" alt="logo gov.br" />
+                <img src="https://barra.sistema.gov.br/v1/assets/govbr.webp" alt="logo gov.br" />
               </a>
               <span className="br-divider vertical mx-1"></span>
               <div className="header-sign">Ministério da Fazenda</div>
