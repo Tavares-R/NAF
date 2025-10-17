@@ -76,6 +76,7 @@ export function FormularioPage() {
         }
 
         alert(JSON.stringify(dadosCompletos, null, 2));
+        console.log(JSON.stringify(dadosCompletos, null, 2))
     }
 
     const camposObrigatorios: (keyof IFormularioData)[] = [
@@ -113,7 +114,7 @@ export function FormularioPage() {
 
         <div className="br-divider"></div>
 
-        <div className="form-fields mt-4 ml-4">
+        <div className="form-fields mt-4">
             <h2 className='text-medium text-bold mb-4'>Detalhes do Atendimento</h2>
 
             {/* Campo de data  */}
